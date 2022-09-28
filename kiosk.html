@@ -1,0 +1,238 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@1.19.0/dist/full.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2/dist/tailwind.min.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+    <script src="https://unpkg.com/vue@3"></script>
+    <script src="https://unpkg.com/vue-router@4"></script>
+    <title>KoRal Retail - KiosK Skeleton</title>
+    <style>
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0 auto;
+        }
+
+        .card {
+            width: 300px;
+            height: 400px;
+        }
+
+        .card-img-container {
+            max-height: 200px;
+            overflow: hidden;
+        }
+
+        .responsive-img {
+          width: 100%;
+          height: auto;
+          object-fit: cover;
+        }
+
+        .btn-animation:active {
+            transform: scale(0.99);
+            transition: .1s;
+        }
+
+        table thead th {
+                border-top: none !important;
+                border-bottom: none !important;
+                box-shadow: inset 0 -2px 0 #4131d3;
+                padding: 2px 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="kiosk" class="pb-96">
+<!-- * Logo Navs -->
+<div class="navbar shadow-lg bg-neutral text-neutral-content">
+    <div class="flex-none">
+      <img src="./logoipsum-logo-35.svg" alt="">
+    </div> 
+    <div class="flex-1 mx-2">
+      <span class="text-lg font-bold">
+              KoRal Retail
+        </span>
+    </div> 
+    <div class="flex-none">
+      <button class="btn btn-square btn-primary px-8">
+        Help
+      </button>
+    </div>
+  </div>
+  <!-- * Tabs -->
+  <div class="tabs tab-bordered tabs-boxed sticky top-0 bg-base-100 z-10">
+    <a class="tab tab-lg" :class="{ 'tab-active': showMakanan}" @click="toMakanan">Makanan</a>
+    <a class="tab tab-lg" :class="{ 'tab-active': showMinuman}" @click="toMinuman">Minuman</a>
+    <a class="tab tab-lg" :class="{ 'tab-active': showEsKrim}" @click="toEsKrim">Es Krim</a>
+  </div>
+
+  <!-- * Cards -->
+ 
+  <div class="grid grid-cols-3 justify-items-center gap-6 mt-8 mx-4 ">
+
+    <div class="card text-center shadow-md compact" v-for="menu in makanan"  v-if="showMakanan">
+      <figure class="card-img-container mb-4">
+        <img :src=`./assets/${menu.picture}` class="rounded-xl responsive-img">
+      </figure>
+      <div class="flex flex-col gap-2 mb-4">
+        <h2 class="text-xl font-bold w-10/12 mx-auto">{{ menu.name }}</h2>
+        <p class="text-2xl text-primary">Rp {{ menu.price }}</p>
+      </div>
+      <div class="flex place-content-center gap-4 mb-4">
+        <button class="btn btn-primary text-2xl" @click='substractQty(menu)'>-</button>
+        <input type="number" name="" id="" class="input input-bordered w-28" :value="menu.qty">
+        <button class="btn btn-primary  text-2xl" @click='addQty(menu)'>+</button>
+      </div>
+    </div>
+
+    <div class="card text-center shadow-md compact" v-for="menu in minuman" v-if="showMinuman">
+      <figure class="card-img-container mb-4">
+        <img :src=`./assets/${menu.picture}` class="rounded-xl responsive-img">
+      </figure>
+      <div class="flex flex-col gap-2 mb-4">
+        <h2 class="text-xl font-bold w-10/12 mx-auto">{{ menu.name }}</h2>
+        <p class="text-2xl text-primary">Rp {{ menu.price }}</p>
+      </div>
+      <div class="flex place-content-center gap-4 mb-4">
+        <button class="btn btn-primary text-2xl" @click='substractQty(menu)'>-</button>
+        <input type="number" name="" id="" class="input input-bordered w-28" :value="menu.qty">
+        <button class="btn btn-primary  text-2xl" @click='addQty(menu)'>+</button>
+      </div>
+    </div>
+
+    <div class="card text-center shadow-md compact" v-for="menu in esKrim" v-if="showEsKrim">
+          <figure class="card-img-container mb-4">
+            <img :src=`./assets/${menu.picture}` class="rounded-xl responsive-img">
+          </figure>
+          <div class="flex flex-col gap-2 mb-4">
+            <h2 class="text-xl font-bold w-10/12 mx-auto">{{ menu.name }}</h2>
+            <p class="text-2xl text-primary">Rp {{ menu.price }}</p>
+          </div>
+          <div class="flex place-content-center gap-4 mb-4">
+            <button class="btn btn-primary text-2xl" @click='substractQty(menu)'>-</button>
+            <input type="number" name="" id="" class="input input-bordered w-28" :value="menu.qty">
+            <button class="btn btn-primary  text-2xl" @click='addQty(menu)'>+</button>
+          </div>
+    </div>
+  </div>
+
+  <!-- * Cart -->
+  <div class="fixed bottom-0 w-full">
+    <div class="max-h-72 min-h-60 overflow-y-auto bg-gray-100">
+      <table class="table w-full table-zebra border-seperate rounded-none">
+        <thead class="sticky top-0 shadow-md">
+          <tr class="text-xl font-bold text-primary">
+            <th class=""></th> 
+            <th class="">Menu</th> 
+            <th class="">Jumlah</th> 
+            <th class="">Harga</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="item in cart">
+            <td><button @click="removeItemFromCart(menu)" class="btn btn-primary"><i class="uil uil-times"></i></button></td> 
+            <td>{{ item.name }}</td> 
+            <td>{{ item.qty }}</td> 
+            <td>{{ item.price }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+      <div class="w-full p-4 flex items-center justify-between bg-white">
+          <p class="text-2xl">Total</p>
+          <div class="flex items-center gap-4">
+              <p class="text-2xl font-bold text-primary">Rp.{{ kalkulasiTotal }}</p>
+              <label :for="checkIfCartIsEmpty" class="btn btn-primary modal-button">Checkout</label> 
+          </div>
+      </div>
+
+      <!-- * Checkout Modal -->
+      <input type="checkbox" id="checkout-modal" class="modal-toggle"> 
+      <div class="modal">
+        <div class="modal-box">
+
+          <!-- * PAGE ONE -->
+          <!-- * Konfirmasi & Pilih Cara Pembayaran-->
+          <div class="block" v-if='pageOne'>
+            <ul class="steps steps-horizontal mx-auto mb-4 border-b-2 ">
+              <li class="step step-primary">Konfirmasi & Pilih Cara Pembayaran</li>  
+              <li class="step">Bayar</li> 
+              <li class="step">Print Receipt</li>
+            </ul>
+            <div class="max-h-80 overflow-y-auto bg-gray-100 mb-2">
+              <table class="table w-full table-zebra border-seperate rounded-none">
+                <thead class="sticky top-0 shadow-md">
+                  <tr class="text-xl font-bold text-primary">
+                    <th class=""></th> 
+                    <th class="">Menu</th> 
+                    <th class="">Jumlah</th> 
+                    <th class="">Harga</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="item in cart">
+                    <td><button @click="removeItemFromCart(menu)" class="btn btn-primary"><i class="uil uil-times"></i></button></td> 
+                    <td>{{ item.name }}</td> 
+                    <td>{{ item.qty }}</td> 
+                    <td>{{ item.price }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="text-xl font-bold text-primary mb-8">Total: Rp {{kalkulasiTotal}}</p>
+            <!-- * Metode Pembayaran -->
+  
+            <div class="grid grid-cols-2 gap-2 mb-4">
+              <div class="form-control border-solid border-2 border-primary rounded-md" v-for="item in paymentMethods">
+                <label class="cursor-pointer label">
+                  <span class="label-text"><img :src="item.img" :alt="item.id" class="w-32 h-10"></span> 
+                  <input type="radio" name="opt" checked="checked" class="radio radio-primary" value="">
+                </label>
+              </div>  
+            </div>
+            <button class="w-full btn btn-primary" @click="toPageTwo">Pembayaran</button> 
+          </div>
+
+          <!-- * PAGE TWO -->
+          <!-- * Pembayaran -->
+          <div v-if="pageTwo">
+            <ul class="steps steps-horizontal mx-auto">
+              <li class="step step-primary">Konfirmasi & Pilih Cara Pembayaran</li>  
+              <li class="step step-primary">Bayar</li> 
+              <li class="step">Print Receipt</li>
+            </ul>
+            <p class="text-lg text-center">Silahkan scan QR code berikut</p>
+            <img src="./assets/QR.png" alt="" class="mx-auto">
+            <p class="text-xl text-primary text-center">Total yang harus dibayar</p>
+            <p class="text-2xl text-primary text-center font-bold">Rp.{{ kalkulasiTotal }}</p>
+            <div class="modal-action w-full">
+              <button class="w-full btn btn-primary" @click="toPageThree">Next</button> 
+            </div>
+          </div>
+
+          <!-- * PAGE THREE -->
+          <!-- * Thank you page & Print receipt -->
+          <div v-if="pageThree">
+            <ul class="steps steps-horizontal mx-auto">
+              <li class="step step-primary">Konfirmasi & Pilih Cara Pembayaran</li>  
+              <li class="step step-primary">Bayar</li> 
+              <li class="step step-primary">Print Receipt</li>
+            </ul>
+            <div class="mx-auto my-10 text-center text-2xl">
+              <p class="mb-4">Receipt Anda Sedang di print</p>
+              <img src="./assets/billing-machine.png" alt="" class="text-primary w-72 h-72 mx-auto mb-4">
+            </div>
+          </div>
+
+        </div>
+      </div>
+  </div>
+    </div>
+
+<script src="kiosk.js"></script>   
+</body>
+</html>
